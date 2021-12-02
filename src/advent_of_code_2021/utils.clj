@@ -8,4 +8,4 @@
   (-> res-path
       io/resource
       slurp
-      (string/split #"\n")))
+      string/split-lines))
