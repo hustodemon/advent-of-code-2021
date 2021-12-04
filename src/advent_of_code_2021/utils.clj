@@ -4,8 +4,13 @@
    [clojure.java.io :as io]))
 
 
-(defn slurp-lines [res-path]
+(defn slurp-res [res-path]
   (-> res-path
       io/resource
-      slurp
+      slurp))
+
+
+(defn slurp-lines [res-path]
+  (-> res-path
+      slurp-res
       string/split-lines))
