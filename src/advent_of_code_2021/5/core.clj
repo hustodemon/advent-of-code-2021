@@ -26,15 +26,9 @@
     (range smaller (inc bigger))))
 
 
-(defn- is-straight?
-  "True if given pair of coords are a horizontal or vertical line."
-  [[[x1 y1] [x2 y2] :as line-coord]]
-  (or (= x1 x2) (= y1 y2)))
-
-
 (defn- compute-line-points [[[x1 y1] [x2 y2] :as line-coord]]
   [x1 y1 x2 y2]
-  (if (is-straight? line-coord)
+  (if (or (= x1 x2) (= y1 y2)) ;; horizontal or vertical
     (for [x (numbers-between x1 x2)
           y (numbers-between y1 y2)]
       [x y])
@@ -60,14 +54,8 @@
 
 
 ;; Part 2
-(defn- is-diagonal? [[[x1 y1] [x2 y2] :as line-coord]]
-  (= (Math/abs (- x1 x2))
-     (Math/abs (- y1 y2))))
-
-
 (defn- walk-closer
-  "Given 2 points (src and dst), compute the next point on the path from src to dst.
-  If src == dst, return the result wrappped in `reduced`"
+  "Given 2 points (src and dst), compute the next point on the path from src to dst."
   [[[x1 y1 :as src] [x2 y2 :as dst] :as line-coord]]
   [(cond
      (< x1 x2) (inc x1)
@@ -79,9 +67,8 @@
      :else     y1)])
 
 
+;; let's try something different here and implement it recursively
 (defn- compute-line-points-2 [[[x1 y1 :as src] [x2 y2 :as dst] :as line-coord]]
-  ;; make sure we are dealing with either horizontal, vertical, or diagonal
-  ;; lines, otherwise walking will be not be straight
   (if (= src dst) [src]
       (conj (compute-line-points-2 [(walk-closer line-coord) dst]) src)))
 
