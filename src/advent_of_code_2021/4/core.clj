@@ -46,45 +46,40 @@
 
 
 ;; Part 2
-;; doesn't work.
-(defn- maps [m f]
-  (into #{} (map m f)))
+
+;; like map, but convert result to set
+(defn- maps [m & cols]
+  (into #{} (apply map m cols)))
+
 
 (defn- remove-num-from-grid-2 [grid n]
   (-> grid
-                (update :rows #(maps (fn [row-or-col] (disj row-or-col n)) %))
-                (update :cols #(maps (fn [row-or-col] (disj row-or-col n)) %))))
+      (update :rows #(maps (fn [row] (disj row n)) %))
+      (update :cols #(maps (fn [col] (disj col n)) %))))
 
 
 (defn- parse-grid-2
-  "Gives us back rows and colums in a single set."
+  "Gives us back rows and colums in sets of sets. "
   [s]
-  (let [rows-raw (string/split-lines s)
-        rows-raw (map string/trim rows-raw)
-        rows-str (map #(string/split % #"\s+") rows-raw)
-        rows     (maps (fn [r] (into #{} (map read-string r))) rows-str)
-        cols     (apply map hash-set rows)]
-    {:rows rows
-     :cols (into #{} cols)}))
-
-(apply concat
- (vals
-  (remove-num-from-grid-2
-   (parse-grid-2 (second data))
-   11)))
+  ;;Sheehs, keeping stuff in sets takes some effort (maps)
+  (let [rows-raw  (string/split-lines s)
+        rows-raw  (map string/trim rows-raw)
+        rows-strs (map #(string/split % #"\s+") rows-raw)
+        rows      (mapv (fn [r] (mapv read-string r)) rows-strs)
+        cols      (apply maps vector rows)]
+    {:rows (maps (partial into #{}) rows)
+     :cols (maps (partial into #{}) cols)}))
 
 
 (defn compute-2 [[fst-draw & rest-draws] grids]
-  (let [res-grids  (maps (fn [g] (remove-num-from-grid-2 g fst-draw)) grids)
-        non-bingos (remove (fn [grid] (or (some? (get (:rows grid) #{}))(some? (get (:cols grid) #{})))) res-grids)]
-    ;;(doall (map println res-grids))
-    (if (= 1 (count non-bingos))
-      (* (first   rest-draws)
-         (reduce +
-                 (apply concat (:rows (remove-num-from-grid-2 (first non-bingos) (first rest-draws))))))
-      ;;non-bingo-grid
-      (recur rest-draws res-grids))))
+  (let [grids-after-draw (maps (fn [g] (remove-num-from-grid-2 g fst-draw)) grids)
+        non-bingo-grids  (remove (fn [grid] (or
+                                             (get (:rows grid) #{})
+                                             (get (:cols grid) #{})))
+                                 grids-after-draw)]
+    (if (empty? non-bingo-grids)
+      (* fst-draw
+         (reduce + (apply concat (:rows (first grids-after-draw)))))
+      (recur rest-draws non-bingo-grids))))
 
-;; 9657 too low
-;; 9802 too low
-(compute-2 (parse-draws (first data)) (map parse-grid-2 (rest data)))
+(println "Part 2: " (compute-2 (parse-draws (first data)) (map parse-grid-2 (rest data))))
