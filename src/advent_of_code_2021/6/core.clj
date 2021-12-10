@@ -4,6 +4,8 @@
    [clojure.string :as string]))
 
 
+;; a slightly more tidy version can be found in the core2 namespace
+
 (def test-data [3 4 3 1 2])
 (def real-data (-> "6/input"
                    (utils/slurp-res)
@@ -61,7 +63,6 @@
 
 (defn steps-2 [state] (iterate step-2 state))
 
-;; too low :/ 343441
-(apply +
-       (nth (steps-2 (fish->time-to-give-birth-counts real-data)) 256))
+(println "Part 2: " (apply +
+                           (nth (steps-2 (fish->time-to-give-birth-counts real-data)) 256)))
 
