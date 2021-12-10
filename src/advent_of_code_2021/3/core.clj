@@ -64,5 +64,5 @@
       (recur (inc pos) selected comp-fn))))
 
 
-(println "Part 2: " (* (compute-2 0 data >)
+(println "Part 2: " (* (compute-2 0 test-data >)
                        (compute-2 0 data <=)))
