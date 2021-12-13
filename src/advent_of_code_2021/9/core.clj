@@ -56,8 +56,6 @@
 
 ;; Part 2, in the end I decided to implement a solution using a search algorithm (not very nice one)
 ;; (I wanted to come up with a basin-merging algorithm, that would go line-by-line, but I chickened out)
-;; it's also pretty ugly, that the points are [y x], not vice-versa, but i don't care now. next time
-;; i'll use the {:x X, :y Y} format
 (defn dfs [start-point grid]
   (loop [[fst-pt & rest-pts] [start-point]
          done-pts-set        #{}]
